@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from "../generated/prisma";
+import { Prisma, PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 
 const prisma = new PrismaClient();
@@ -6,16 +6,17 @@ const prisma = new PrismaClient();
 export class UserController {
 	public static async createUser(request: Request, response: Response) {
 		try {
-			const { fullName, userName, email } = request.body;
+			const { nomeCompleto, email, genero, numeroTelefone } = request.body;
 
-			const createInput: Prisma.UserCreateInput = {
-				fullName: fullName,
-				userName: userName,
+			const userCreateInput: Prisma.UsuarioCreateInput = {
+				nomeCompleto: nomeCompleto,
+				numeroTelefone: numeroTelefone,
+				genero: genero,
 				email: email,
 			};
 
-			const createdUser = await prisma.user.create({
-				data: createInput,
+			const createdUser = await prisma.usuario.create({
+				data: userCreateInput,
 			});
 
 			response.status(201).json(createdUser);
@@ -28,20 +29,18 @@ export class UserController {
 		try {
 			const { userId } = request.params;
 
-			const foundUser = await prisma.user.findUnique({
+			const foundUser = await prisma.usuario.findUnique({
 				where: {
 					id: userId,
 				},
-				include: {
-					bookRent: {
-						select: {
-							book:true
-						},
-					},
-				},
 			});
 
-			response.status(201).json(foundUser);
+			if (!foundUser) {
+				response.status(404).json({ message: "Usuário não encontrado" });
+				return;
+			}
+
+			response.status(200).json(foundUser);
 		} catch (error: any) {
 			response.status(500).json({ message: error.message });
 		}
@@ -49,9 +48,14 @@ export class UserController {
 
 	public static async readAllUsers(request: Request, response: Response) {
 		try {
-			const users = await prisma.user.findMany({});
+			const foundUsers = await prisma.usuario.findMany();
 
-			response.status(200).json(users);
+			if (!foundUsers) {
+				response.status(404).json({ message: "Usuário não encontrado" });
+				return;
+			}
+
+			response.status(200).json(foundUsers);
 		} catch (error: any) {
 			response.status(500).json({ message: error.message });
 		}
@@ -60,16 +64,17 @@ export class UserController {
 	public static async updateUser(request: Request, response: Response) {
 		try {
 			const { userId } = request.params;
-			const { fullName, userName, email } = request.body;
+			const { nomeCompleto, email, genero, numeroTelefone } = request.body;
 
-			const createInput: Prisma.UserUpdateInput = {
-				fullName: fullName,
-				userName: userName,
+			const userUpdateInput: Prisma.UsuarioUpdateInput = {
+				nomeCompleto: nomeCompleto,
+				numeroTelefone: numeroTelefone,
+				genero: genero,
 				email: email,
 			};
 
-			const updatedUser = await prisma.user.update({
-				data: createInput,
+			const updatedUser = await prisma.usuario.update({
+				data: userUpdateInput,
 				where: {
 					id: userId,
 				},
@@ -81,65 +86,19 @@ export class UserController {
 		}
 	}
 
-	public static async upsertUser(request: Request, response: Response) {
-		try {
-			const { userId } = request.params;
-			const { fullName, userName, email } = request.body;
-
-			const createInput: Prisma.UserCreateInput = {
-				fullName: fullName,
-				userName: userName,
-				email: email,
-			};
-
-			const updateInput: Prisma.UserUpdateInput = {
-				fullName: fullName,
-				userName: userName,
-				email: email,
-			};
-
-			const upsertedUser = await prisma.user.upsert({
-				create: createInput,
-				update: updateInput,
-				where: {
-					id: userId,
-				},
-			});
-
-			response.status(201).json(upsertedUser);
-		} catch (error: any) {
-			response.status(500).json({ message: error.message });
-		}
-	}
-
 	public static async deleteUser(request: Request, response: Response) {
 		try {
 			const { userId } = request.params;
 
-			const deletedUser = await prisma.user.delete({
+			const deletedUser = await prisma.usuario.delete({
 				where: {
 					id: userId,
 				},
 			});
 
-			response.status(200).json(deletedUser);
-		} catch (error: any) {
-			response.status(500).json({ message: error.message });
-		}
-	}
-
-	public static async deleteAllUsers(request: Request, response: Response) {
-		try {
-			const deletedUser = await prisma.user.deleteMany();
 			response.status(200).json(deletedUser);
 		} catch (error: any) {
 			response.status(500).json({ message: error.message });
 		}
 	}
 }
-
-
-
-
-
-

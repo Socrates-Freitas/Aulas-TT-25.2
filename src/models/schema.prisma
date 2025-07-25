@@ -6,37 +6,49 @@
 
 generator client {
         provider = "prisma-client-js"
-        output   = "../generated/prisma"
 }
 
 datasource db {
-        provider = "sqlite"
-        url      = "file:./db.sql"
+        provider = "postgresql"
+        url      = env("DATABASE_URL")
 }
 
-model Book {
-        id     String @id @default(uuid())
-        title  String
-        author String
-        genre  String
+model Usuario {
+        id             String @id @default(uuid())
+        nomeCompleto   String
+        numeroTelefone String
+        genero         String
+        email          String @unique
 
-        bookRent BookRent[]
+        veiculos Veiculo[]
 }
 
-model User {
-        id       String     @id @default(uuid())
-        fullName String
-        userName String
-        email    String
-        bookRent BookRent[]
+model Veiculo {
+        placaVeiculo String  @id
+        modelo       String
+        ano          Int
+        cor          String
+        idUsuario    String
+        usuario      Usuario @relation(fields: [idUsuario], references: [id], onDelete: Cascade)
+
+        lavagens        Lavagem[]
+        estacionamentos Estacionamento[]
 }
 
-model BookRent {
-        bookId String
-        book   Book   @relation(fields: [bookId], references: [id])
+model Lavagem {
+        id           String   @id @default(uuid())
+        tipoLavagem  String
+        data         DateTime
+        placaVeiculo String
+        veiculo      Veiculo  @relation(fields: [placaVeiculo], references: [placaVeiculo], onDelete: Cascade)
+        preco        Float
+}
 
-        userId String
-        user   User   @relation(fields: [userId], references: [id])
-
-        @@id([userId, bookId])
+model Estacionamento {
+        id           String   @id @default(uuid())
+        dataEntrada  DateTime
+        dataSaida    DateTime
+        preco        Float
+        placaVeiculo String
+        veiculo      Veiculo  @relation(fields: [placaVeiculo], references: [placaVeiculo], onDelete: Cascade)
 }
