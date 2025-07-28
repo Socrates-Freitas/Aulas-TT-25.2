@@ -1,4 +1,3 @@
-import { w } from "@faker-js/faker/dist/airline-CLphikKp";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 
@@ -7,7 +6,7 @@ const prisma = new PrismaClient();
 export class BookRentController {
   public static async createBookRent(request: Request, response: Response) {
     try {
-      const { bookId, userId } = request.body;
+      const { bookId, userId, price } = request.body;
 
       const user = await prisma.user.findUnique({
         where: {
@@ -37,6 +36,7 @@ export class BookRentController {
             id: userId,
           },
         },
+        price: price,
       };
 
       const createdBookRent = await prisma.bookRent.create({
@@ -86,7 +86,7 @@ export class BookRentController {
 
   public static async updateBookRent(request: Request, response: Response) {
     try {
-      const { bookId, userId } = request.body;
+      const { bookId, userId, price } = request.body;
 
       const user = await prisma.user.findUnique({
         where: {
@@ -116,6 +116,7 @@ export class BookRentController {
             id: userId,
           },
         },
+        price: price,
       };
 
       const updatedBookRent = await prisma.bookRent.update({
@@ -153,3 +154,4 @@ export class BookRentController {
     }
   }
 }
+

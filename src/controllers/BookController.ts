@@ -1,4 +1,3 @@
-import { w } from "@faker-js/faker/dist/airline-CLphikKp";
 import { Prisma, PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 
@@ -95,3 +94,4 @@ export class BookController {
     }
   }
 }
+

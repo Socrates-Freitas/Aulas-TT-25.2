@@ -14,20 +14,22 @@ datasource db {
 }
 
 model Book {
-        id     String @id @default(uuid())
-        title  String
-        author String
-        genre  String
+        id            String  @id @default(uuid())
+        title         String
+        author        String
+        genre         String
+        isPremiumOnly Boolean @default(false)
 
         bookRent BookRent[]
 }
 
 model User {
-        id       String     @id @default(uuid())
-        fullName String
-        userName String
-        email    String
-        bookRent BookRent[]
+        id        String     @id @default(uuid())
+        fullName  String
+        userName  String
+        email     String
+        bookRent  BookRent[]
+        isPremium Boolean    @default(false)
 }
 
 model BookRent {
@@ -36,6 +38,8 @@ model BookRent {
 
         userId String
         user   User   @relation(fields: [userId], references: [id])
+        price  Float
 
         @@id([userId, bookId])
 }
+

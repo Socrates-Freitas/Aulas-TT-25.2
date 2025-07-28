@@ -1,4 +1,5 @@
-import { PrismaClient } from "../../generated/prisma";
+import { PrismaClient } from "@prisma/client";
+import { bookSeeder } from "./BookSeeder";
 import { userSeeder } from "./UserSeeder";
 
 const prisma = new PrismaClient();
@@ -6,9 +7,8 @@ const prisma = new PrismaClient();
 async function main() {
 	await prisma.$connect();
 
-	userSeeder(prisma,20)
-
-
+	await userSeeder(prisma, 20);
+	await bookSeeder(prisma, 50);
 }
 
 main()
