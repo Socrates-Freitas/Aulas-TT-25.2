@@ -1,6 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import z from "zod";
+import z, { treeifyError } from "zod";
+import UserValidator from "../config/UserValidator";
 
 const prisma = new PrismaClient();
 
@@ -8,6 +9,13 @@ export class UserController {
   public static async createUser(request: Request, response: Response) {
     try {
       const { fullName, userName, email } = request.body;
+
+      const validacao = UserValidator.createUser.safeParse(request.body);
+
+      if (validacao.error) {
+        response.status(400).json({ errors: treeifyError(validacao.error) });
+        return;
+      }
 
       const createInput: Prisma.UserCreateInput = {
         fullName: fullName,
@@ -138,4 +146,3 @@ export class UserController {
     }
   }
 }
-
